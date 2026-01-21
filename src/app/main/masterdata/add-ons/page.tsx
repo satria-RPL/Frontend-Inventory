@@ -7,8 +7,8 @@ import AddProductModal from "@/components/modals/AddProduct";
 
 const categories = ["Semua Kategori", "Makanan", "Minuman", "Snack"];
 const labels = ["Semua Label", "Best Seller", "Promo", "New"];
-const nameOptions = ["Semua Nama", "Ayam", "Tepung", "Gula"];
-const unitOptions = ["Semua Satuan", "Kg", "Gram", "Liter"];
+const nameOptions = ["Semua Nama", "Saos", "Mayones", "Keju"];
+const unitOptions = ["Semua Satuan", "Pcs", "Pack", "Gram"];
 
 export default function DashboardPage() {
   const [category, setCategory] = useState("Semua Kategori");
@@ -25,7 +25,7 @@ export default function DashboardPage() {
     <div className="min-h-screen space-y-6 p-4">
       {/* HEADER */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-medium">Daftar Bahan Baku</h1>
+        <h1 className="text-3xl font-medium">Daftar Add-Ons</h1>
 
         <div className="flex gap-2 p-2">
           <button

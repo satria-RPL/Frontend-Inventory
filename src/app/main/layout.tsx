@@ -21,7 +21,7 @@ export default async function MainLayout({
 
       {/* Main Content */}
       <main
-        className={`pt-28 p-1 ${isChef ? "px-8" : "pr-20"} bg-gray-50 transition-all duration-30`}
+        className={`pt-28 p-1 ${isChef ? "px-8" : "pr-20"} transition-all duration-30`}
         style={isChef ? undefined : { marginLeft: "calc(var(--sidebar-width) + 1rem)" }}
       >
         <div className="w-full bg-gray-50">{children}</div>

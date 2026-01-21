@@ -66,6 +66,8 @@ export default function HistoryOrderTable() {
                 className="
                   border-b border-gray-200
                   even:bg-[#fff3ec]
+                  even:[&>td]:font-semibold
+                  odd:[&>td]:font-normal
                   hover:bg-[#fff0e8]
                 "
               >

@@ -1,0 +1,48 @@
+"use server";
+
+import { redirect } from "next/navigation";
+import { createLoginUser } from "@/domain/auth/loginUser";
+import {
+  clearSessionCookie,
+  setSessionCookie,
+} from "@/lib/session/authSession";
+import { loginService } from "@/lib/services/authService";
+import type { LoginFormState } from "../../../types/login";
+
+const loginUser = createLoginUser(loginService);
+
+export async function handleLogin(
+  _prevState: LoginFormState,
+  formData: FormData,
+): Promise<LoginFormState> {
+  const username = (formData.get("username") as string) ?? "";
+  const password = (formData.get("password") as string) ?? "";
+
+  const result = await loginUser(username, password);
+
+  if (!result.success || !result.user || !result.token) {
+    return { error: result.message ?? "Login gagal, token tidak valid." };
+  }
+
+  const user = result.user;
+
+  await setSessionCookie(
+    JSON.stringify({
+      userId: result.userId ?? user.id ?? null,
+      name: user.name ?? user.username ?? "",
+      role: user.role ?? "",
+      username: user.username ?? "",
+      token: result.token,
+      tokenType: result.tokenType,
+      refreshToken: result.refreshToken,
+    }),
+  );
+
+  // cashier / admin / default
+  redirect("/main/dashboard");
+}
+
+export async function logout() {
+  await clearSessionCookie();
+  redirect("/auth/login");
+}

@@ -35,6 +35,7 @@ function SideNavGroup({
 }) {
   const isActive = item.children?.some((c) => c.active);
   const [open, setOpen] = useState(isActive ?? false);
+  const iconClass = "shrink-0 text-[14px] [&_svg]:h-4 [&_svg]:w-4";
 
   return (
     <div>
@@ -43,20 +44,20 @@ function SideNavGroup({
         type="button"
         onClick={() => setOpen((o) => !o)}
         className={cn(
-          "w-full flex items-center justify-between rounded-md px-4 py-1 text-sm transition-colors",
+          "w-full flex items-center justify-between rounded-md px-3 py-1.5 text-[13px] transition-colors",
           isActive || open
             ? "bg-orange-50 text-orange-500"
             : "hover:bg-orange-50 hover:text-orange-500"
         )}
       >
-        <div className="flex items-center gap-2 text-base">
-          {item.icon}
+        <div className="flex items-center gap-2">
+          <span className={iconClass}>{item.icon}</span>
           {isSidebarExpanded && <span>{item.name}</span>}
         </div>
 
         {isSidebarExpanded && (
           <ChevronDown
-            size={16}
+            size={14}
             className={cn(
               "transition-transform duration-200",
               open && "rotate-180"
@@ -73,13 +74,20 @@ function SideNavGroup({
               key={child.href}
               href={child.href!}
               className={cn(
-                "flex items-center gap-2 rounded-md px-2 py-1 text-sm",
+                "flex items-center gap-2 rounded-md px-2 py-1 text-[13px]",
                 child.active
                   ? "text-orange-500 font-medium"
                   : "text-gray-600 hover:text-orange-500"
               )}
             >
-              {child.icon}
+              <span
+                className={cn(
+                  "shrink-0 text-[14px] [&_svg]:h-3.5 [&_svg]:w-3.5",
+                  child.active ? "text-orange-500" : "text-gray-400"
+                )}
+              >
+                {child.icon}
+              </span>
               {child.name}
             </Link>
           ))}
@@ -103,17 +111,18 @@ function SideNavItem({
 }: SideNavItemProps) {
   //
   const baseClasses =
-    "relative flex items-center whitespace-nowrap rounded-md text-sm duration-100";
+    "relative flex items-center whitespace-nowrap rounded-md text-[13px] duration-100";
   const activeClasses = "bg-orange-50 text-orange-500";
   const inactiveClasses = "hover:bg-orange-50 hover:text-orange-500";
+  const iconClass = "shrink-0 text-[14px] [&_svg]:h-4 [&_svg]:w-4";
 
   return isSidebarExpanded ? (
     <Link
       href={href!}
       className={cn(baseClasses, active ? activeClasses : inactiveClasses)}
     >
-      <div className="flex items-center gap-2 px-4 py-2 text-base">
-        {icon}
+      <div className="flex items-center gap-2 px-3 py-2">
+        <span className={iconClass}>{icon}</span>
         <span>{name}</span>
       </div>
     </Link>
@@ -128,7 +137,9 @@ function SideNavItem({
               active ? activeClasses : inactiveClasses
             )}
           >
-            <div className="flex justify-center px-4 py-2">{icon}</div>
+            <div className="flex justify-center px-3 py-2">
+              <span className={iconClass}>{icon}</span>
+            </div>
           </Link>
         </TooltipTrigger>
         <TooltipContent
@@ -158,7 +169,7 @@ export default function SidebarLeft({ role }: SidebarLeftProps) {
   useEffect(() => {
     document.documentElement.style.setProperty(
       "--sidebar-width",
-      isSidebarExpanded ? "16rem" : "5rem"
+      isSidebarExpanded ? "13rem" : "5rem"
     );
   }, [isSidebarExpanded]);
 
@@ -194,8 +205,8 @@ export default function SidebarLeft({ role }: SidebarLeftProps) {
   return (
     <aside
       className={cn(
-        "fixed top-22 bottom-0 left-0 z-20 border-r-2 border-gray-200 px-3 py-3 transition-all duration-300",
-        isSidebarExpanded ? "w-65" : "w-20"
+        "fixed top-22 bottom-0 left-0 z-20 border-r-2 bg-(--background) border-gray-200 px-3 py-3 transition-all duration-300",
+        isSidebarExpanded ? "w-55" : "w-20"
       )}
     >
       {/* TOGGLE */}

@@ -107,7 +107,7 @@ export default function Pagination({
           <select
             value={perPage}
             onChange={(event) => setPerPage(Number(event.target.value))}
-            className="h-7 min-w-[52px] rounded-md border border-(--tertiary) px-2 outline-none"
+            className="h-7 min-w-13 rounded-md border border-(--tertiary) px-2 outline-none"
           >
             {perPageOptions.map((option) => (
               <option key={option} value={option}>
