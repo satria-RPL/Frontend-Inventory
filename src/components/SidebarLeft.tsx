@@ -17,6 +17,7 @@ import { useNavItems } from "@/config/nav-items";
 import { cn } from "@/lib/utils";
 import type { NavItem } from "@/types/nav";
 import { usePersistentBoolean } from "@/lib/hooks/usePersistentBoolean";
+import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 type SidebarLeftProps = {
@@ -29,12 +30,17 @@ type SidebarLeftProps = {
 function SideNavGroup({
   item,
   isSidebarExpanded,
+  openGroup,
+  onToggleGroup,
 }: {
   item: NavItem;
   isSidebarExpanded: boolean;
+  openGroup: string | null;
+  onToggleGroup: (groupKey: string) => void;
 }) {
   const isActive = item.children?.some((c) => c.active);
-  const [open, setOpen] = useState(isActive ?? false);
+  const groupKey = item.name;
+  const open = openGroup === groupKey;
   const iconClass = "shrink-0 text-[14px] [&_svg]:h-4 [&_svg]:w-4";
 
   return (
@@ -42,7 +48,7 @@ function SideNavGroup({
       {/* PARENT */}
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => onToggleGroup(groupKey)}
         className={cn(
           "w-full flex items-center justify-between rounded-md px-3 py-1.5 text-[13px] transition-colors",
           isActive || open
@@ -201,6 +207,16 @@ export default function SidebarLeft({ role }: SidebarLeftProps) {
 
   const topItems = filteredItems.filter((i) => i.position === "top");
   const bottomItems = filteredItems.filter((i) => i.position === "bottom");
+  const pathname = usePathname();
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
+
+  useEffect(() => {
+    setOpenGroup(null);
+  }, [pathname]);
+
+  const handleToggleGroup = (groupKey: string) => {
+    setOpenGroup((current) => (current === groupKey ? null : groupKey));
+  };
 
   return (
     <aside
@@ -231,6 +247,8 @@ export default function SidebarLeft({ role }: SidebarLeftProps) {
                 key={item.name}
                 item={item}
                 isSidebarExpanded={isSidebarExpanded}
+                openGroup={openGroup}
+                onToggleGroup={handleToggleGroup}
               />
             ) : (
               <SideNavItem
