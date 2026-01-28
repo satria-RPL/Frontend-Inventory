@@ -97,52 +97,52 @@ export default function SalesReportPage() {
       })
       .join(" ");
   return (
-    <div className="min-h-screen space-y-4 bg-gray-50 p-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-base font-semibold text-gray-900">Sales Overview</h1>
+    <div className="min-h-screen space-y-6 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-2xl font-semibold text-gray-900">Sales Overview</h1>
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
-            className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1 text-[10px] text-gray-600 shadow-sm hover:bg-gray-50"
+            className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50"
           >
-            <RefreshCcw size={12} />
+            <RefreshCcw size={16} />
             Reset Filter
           </button>
           <button
             type="button"
-            className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1 text-[10px] text-gray-600 shadow-sm hover:bg-gray-50"
+            className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50"
           >
-            <Download size={12} />
+            <Download size={16} />
             Export All
           </button>
           <button
             type="button"
-            className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1 text-[10px] text-gray-600 shadow-sm hover:bg-gray-50"
+            className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50"
           >
-            <Filter size={12} />
+            <Filter size={16} />
             Export Filter
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-4">
+      <div className="grid grid-cols-12 gap-6">
         {summaryCards.map((card, index) => {
           const Icon = card.icon;
           return (
           <div
             key={card.title}
-            className={`col-span-12 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:col-span-6 lg:col-span-6 ${
+            className={`col-span-12 rounded-xl border border-gray-200 bg-white p-4 sm:col-span-6 lg:col-span-6 ${
               index < 2 ? "h-[281px]" : "h-[199px]"
             }`}
           >
             <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-[13px] text-gray-500">
+              <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                 <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gray-100 text-gray-400">
                   <Icon size={14} />
                 </span>
                 {card.title}
               </div>
-              <div className="flex items-center gap-2 text-[12px] text-gray-400">
+              <div className="flex items-center gap-2 text-xs text-gray-500">
                 <span className="inline-flex items-center rounded-md border border-gray-200 px-3 py-1">
                   {index % 2 === 0 ? "Jan 3 - Jan 10" : "10 Januari"}
                 </span>
@@ -154,15 +154,15 @@ export default function SalesReportPage() {
             </div>
             <div className="mt-4 flex items-center justify-between gap-2">
               <div>
-                <p className="text-xl font-semibold text-gray-900">
+                <p className="text-2xl font-semibold text-gray-900">
                   {card.value}
                 </p>
-                <p className="mt-2 text-sm text-gray-400">
+                <p className="mt-2 text-sm text-gray-500">
                   {card.sublabel}
                 </p>
               </div>
               <span
-                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-semibold ${
+                className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
                   card.trend === "down"
                     ? "bg-red-100 text-red-600"
                     : "bg-green-100 text-green-600"
@@ -170,18 +170,18 @@ export default function SalesReportPage() {
               >
                 {card.delta}
                 {card.trend === "down" ? (
-                  <ArrowDownRight size={11} />
+                  <ArrowDownRight size={13} />
                 ) : (
-                  <ArrowUpRight size={11} />
+                  <ArrowUpRight size={13} />
                 )}
               </span>
             </div>
             {index < 2 ? (
-              <div className="mt-4 flex items-center justify-between text-[11px] text-gray-500">
+              <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
                 <span>QRIS : 5,500 Transaksi</span>
                 <span className="text-gray-300">|</span>
                 <span>Tunai : 5,000 Transaksi</span>
-                <span className="ml-auto inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-400">
+                <span className="ml-auto inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[10px] text-gray-400">
                   i
                 </span>
               </div>
@@ -190,9 +190,9 @@ export default function SalesReportPage() {
         );
         })}
 
-        <div className="col-span-12 rounded-lg border border-gray-200 bg-white p-4 shadow-sm lg:col-span-8">
+        <div className="col-span-12 rounded-xl border border-gray-200 bg-white p-4 lg:col-span-8">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-[12px] text-gray-500">
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
               <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gray-100 text-gray-400">
                 <BarChart3 size={14} />
               </span>
@@ -201,36 +201,36 @@ export default function SalesReportPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[10px] text-gray-500"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
               >
                 5 Hours
-                <ChevronDown size={11} />
+                <ChevronDown size={14} />
               </button>
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[10px] text-gray-500"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
               >
                 Today
-                <ChevronDown size={11} />
+                <ChevronDown size={14} />
               </button>
             </div>
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-3">
+          <div className="mt-4 grid grid-cols-2 gap-4">
             <div>
-              <p className="text-[11px] text-gray-500">Food Cost</p>
-              <p className="mt-1 text-base font-semibold text-gray-900">
+              <p className="text-sm text-gray-500">Food Cost</p>
+              <p className="mt-1 text-lg font-semibold text-gray-900">
                 Rp 105.500.000
               </p>
             </div>
             <div className="text-right">
-              <p className="text-[11px] font-semibold text-red-500">Waste Cost</p>
-              <p className="mt-1 text-base font-semibold text-red-500">
+              <p className="text-sm font-semibold text-red-500">Waste Cost</p>
+              <p className="mt-1 text-lg font-semibold text-red-500">
                 Rp 50.500.000
               </p>
             </div>
           </div>
           <div className="mt-4 flex gap-4">
-            <div className="flex w-10 flex-col justify-between text-[10px] text-gray-400">
+            <div className="flex w-10 flex-col justify-between text-xs text-gray-400">
               {costYAxis.map((label) => (
                 <span key={label}>{label}</span>
               ))}
@@ -253,7 +253,7 @@ export default function SalesReportPage() {
                       style={{ height: `${Math.max(12, height - 22)}%` }}
                     />
                     {index === 5 ? (
-                      <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded bg-green-500 px-2 py-0.5 text-[9px] text-white">
+                      <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded bg-green-500 px-2 py-0.5 text-[10px] text-white">
                         Rp 50.000.000
                       </span>
                     ) : null}
@@ -263,7 +263,7 @@ export default function SalesReportPage() {
               </div>
             </div>
           </div>
-          <div className="mt-3 flex items-center justify-between text-[9px] text-gray-400">
+          <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
             <span />
             {hours.map((label) => (
               <span key={label} className="flex-1 text-center">
@@ -271,7 +271,7 @@ export default function SalesReportPage() {
               </span>
             ))}
           </div>
-          <div className="mt-3 flex items-center gap-4 text-[10px] text-gray-500">
+          <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
             <span className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-orange-200" />
               Food Cost
@@ -283,9 +283,9 @@ export default function SalesReportPage() {
           </div>
         </div>
 
-        <div className="col-span-12 rounded-lg border border-gray-200 bg-white p-4 shadow-sm lg:col-span-4">
+        <div className="col-span-12 rounded-xl border border-gray-200 bg-white p-4 lg:col-span-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[12px] text-gray-500">
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
               <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gray-100 text-gray-400">
                 <BarChart3 size={14} />
               </span>
@@ -294,33 +294,33 @@ export default function SalesReportPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[10px] text-gray-500"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
               >
                 Jan 3 - Jan 10
-                <ChevronDown size={11} />
+                <ChevronDown size={14} />
               </button>
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[10px] text-gray-500"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
               >
                 Weekly
-                <ChevronDown size={11} />
+                <ChevronDown size={14} />
               </button>
             </div>
           </div>
-          <div className="mt-3 text-xl font-semibold text-gray-900">
+          <div className="mt-4 text-2xl font-semibold text-gray-900">
             10,500
-            <span className="ml-2 text-xs font-medium text-gray-500">
+            <span className="ml-2 text-sm font-medium text-gray-500">
               Total Pesanan
             </span>
           </div>
-          <p className="mt-1 text-[11px] text-gray-400">
+          <p className="mt-2 text-xs text-gray-500">
             Metode pesanan yang sering di gunakan
           </p>
           <div className="mt-4 space-y-4">
             {paymentMethods.map((method) => (
               <div key={method.label}>
-                <div className="flex items-center justify-between text-[11px] text-gray-500">
+                <div className="flex items-center justify-between text-xs text-gray-500">
                   <span>{method.label}</span>
                 </div>
                 <div className="mt-2 flex items-center gap-2">
@@ -331,7 +331,7 @@ export default function SalesReportPage() {
                       style={{ width: `${method.value}%` }}
                     >
                       {method.badge ? (
-                        <span className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 rounded bg-green-500 px-1.5 text-[9px] text-white">
+                        <span className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 rounded bg-green-500 px-1.5 text-[10px] text-white">
                           {method.badge}
                         </span>
                       ) : null}
@@ -341,26 +341,26 @@ export default function SalesReportPage() {
               </div>
             ))}
           </div>
-          <div className="mt-4 flex items-center justify-between text-[10px] text-gray-400">
+          <div className="mt-4 flex items-center justify-between text-xs text-gray-400">
             <span>0</span>
             <span>200</span>
             <span>500</span>
             <span>1K</span>
             <span>2K</span>
           </div>
-          <div className="mt-4 flex items-center justify-between text-[10px] text-gray-500">
+          <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
             <span>Dine In</span>
             <span>Take Away</span>
           </div>
-          <div className="mt-1 flex items-center justify-between text-[10px] font-semibold text-gray-700">
+          <div className="mt-1 flex items-center justify-between text-xs font-semibold text-gray-700">
             <span>5012</span>
             <span>1710</span>
           </div>
         </div>
 
-        <div className="col-span-12 rounded-lg border border-gray-200 bg-white p-4 shadow-sm lg:col-span-4">
+        <div className="col-span-12 rounded-xl border border-gray-200 bg-white p-4 lg:col-span-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[12px] text-gray-500">
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
               <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gray-100 text-gray-400">
                 <BarChart3 size={14} />
               </span>
@@ -369,28 +369,28 @@ export default function SalesReportPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[10px] text-gray-500"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
               >
                 Jan 3 - Jan 10
-                <ChevronDown size={11} />
+                <ChevronDown size={14} />
               </button>
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[10px] text-gray-500"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
               >
                 Weekly
-                <ChevronDown size={11} />
+                <ChevronDown size={14} />
               </button>
             </div>
           </div>
           <div className="mt-2">
-            <p className="text-xl font-semibold text-gray-900">10,500</p>
-            <p className="text-[11px] text-gray-400">Total Penjualan</p>
+            <p className="text-2xl font-semibold text-gray-900">10,500</p>
+            <p className="text-sm text-gray-500">Total Penjualan</p>
           </div>
           <div className="mt-4 space-y-4">
             {salesCategories.map((category) => (
               <div key={category.label}>
-                <div className="flex items-center justify-between text-[11px] text-gray-500">
+                <div className="flex items-center justify-between text-xs text-gray-500">
                   <span>{category.label}</span>
                 </div>
                 <div className="mt-2 flex items-center gap-2">
@@ -401,7 +401,7 @@ export default function SalesReportPage() {
                       style={{ width: `${category.value}%` }}
                     >
                       {category.badge ? (
-                        <span className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 rounded bg-green-500 px-1.5 text-[9px] text-white">
+                        <span className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 rounded bg-green-500 px-1.5 text-[10px] text-white">
                           {category.badge}
                         </span>
                       ) : null}
@@ -411,7 +411,7 @@ export default function SalesReportPage() {
               </div>
             ))}
           </div>
-          <div className="mt-4 flex items-center justify-between text-[9px] text-gray-400">
+          <div className="mt-4 flex items-center justify-between text-xs text-gray-400">
             <span>0</span>
             <span>200</span>
             <span>500</span>
@@ -420,9 +420,9 @@ export default function SalesReportPage() {
           </div>
         </div>
 
-        <div className="col-span-12 rounded-lg border border-gray-200 bg-white p-4 shadow-sm lg:col-span-8">
+        <div className="col-span-12 rounded-xl border border-gray-200 bg-white p-4 lg:col-span-8">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[12px] text-gray-500">
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
               <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gray-100 text-gray-400">
                 <Wallet size={14} />
               </span>
@@ -431,31 +431,31 @@ export default function SalesReportPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[10px] text-gray-500"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
               >
                 Jan 3 - Jan 10
-                <ChevronDown size={11} />
+                <ChevronDown size={14} />
               </button>
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[10px] text-gray-500"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
               >
                 Weekly
-                <ChevronDown size={11} />
+                <ChevronDown size={14} />
               </button>
             </div>
           </div>
-          <div className="mt-2 text-xl font-semibold text-gray-900">
+          <div className="mt-4 text-2xl font-semibold text-gray-900">
             Rp 105.500.000
           </div>
           <div className="mt-2 flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-600">
+            <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-600">
               +10.5%
-              <ArrowUpRight size={11} />
+              <ArrowUpRight size={13} />
             </span>
-            <span className="text-[10px] text-gray-400">Total Saldo</span>
+            <span className="text-xs text-gray-500">Total Saldo</span>
           </div>
-          <div className="mt-4 rounded-lg border border-dashed border-gray-200 bg-white p-3">
+          <div className="mt-4 rounded-xl border border-dashed border-gray-200 bg-white p-3">
             <div className="relative">
               <div className="pointer-events-none absolute inset-0 flex flex-col justify-between">
                 {costYAxis.map((label) => (
@@ -480,17 +480,17 @@ export default function SalesReportPage() {
                   );
                 })}
               </svg>
-              <span className="absolute right-24 top-10 rounded bg-green-500 px-2 py-0.5 text-[9px] text-white">
+              <span className="absolute right-24 top-10 rounded bg-green-500 px-2 py-0.5 text-[10px] text-white">
                 Rp 20.000.000
               </span>
             </div>
-            <div className="mt-2 flex justify-between text-[9px] text-gray-400">
+            <div className="mt-2 flex justify-between text-xs text-gray-400">
               {days.map((label) => (
                 <span key={label}>{label}</span>
               ))}
             </div>
           </div>
-          <div className="mt-3 flex items-center gap-4 text-[10px] text-gray-500">
+          <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
             {saldoSeries.map((series) => (
               <span key={series.label} className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full" style={{ backgroundColor: series.color }} />
@@ -500,9 +500,9 @@ export default function SalesReportPage() {
           </div>
         </div>
 
-        <div className="col-span-12 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="col-span-12 rounded-xl border border-gray-200 bg-white p-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[12px] text-gray-500">
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
               <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gray-100 text-gray-400">
                 <BarChart3 size={14} />
               </span>
@@ -511,32 +511,32 @@ export default function SalesReportPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[10px] text-gray-500"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
               >
                 Jan 3 - Jan 10
-                <ChevronDown size={11} />
+                <ChevronDown size={14} />
               </button>
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[10px] text-gray-500"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
               >
                 Weekly
-                <ChevronDown size={11} />
+                <ChevronDown size={14} />
               </button>
             </div>
           </div>
-          <div className="mt-2 text-xl font-semibold text-gray-900">
+          <div className="mt-4 text-2xl font-semibold text-gray-900">
             Rp 105.500.000
           </div>
           <div className="mt-2 flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-600">
+            <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-600">
               +10.5%
-              <ArrowUpRight size={11} />
+              <ArrowUpRight size={13} />
             </span>
-            <span className="text-[10px] text-gray-400">Total Profitabilitas</span>
+            <span className="text-xs text-gray-500">Total Profitabilitas</span>
           </div>
           <div className="mt-4 flex gap-4">
-            <div className="flex w-10 flex-col justify-between text-[10px] text-gray-400">
+            <div className="flex w-10 flex-col justify-between text-xs text-gray-400">
               {costYAxis.map((label) => (
                 <span key={`profit-${label}`}>{label}</span>
               ))}
@@ -559,7 +559,7 @@ export default function SalesReportPage() {
                       style={{ height: `${Math.max(12, height - 14)}%` }}
                     />
                     {index === 5 ? (
-                      <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded bg-green-500 px-2 py-0.5 text-[9px] text-white">
+                      <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded bg-green-500 px-2 py-0.5 text-[10px] text-white">
                         Rp 50.000.000
                       </span>
                     ) : null}
@@ -567,14 +567,14 @@ export default function SalesReportPage() {
                   </div>
                 ))}
               </div>
-              <div className="mt-2 flex justify-between text-[9px] text-gray-400">
+              <div className="mt-2 flex justify-between text-xs text-gray-400">
                 {days.map((label) => (
                   <span key={`profit-day-${label}`}>{label}</span>
                 ))}
               </div>
             </div>
           </div>
-          <div className="mt-3 flex items-center gap-4 text-[10px] text-gray-500">
+          <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
             <span className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-orange-200" />
               Harga Jual
@@ -586,9 +586,9 @@ export default function SalesReportPage() {
           </div>
         </div>
 
-        <div className="col-span-12 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="col-span-12 rounded-xl border border-gray-200 bg-white p-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[12px] text-gray-500">
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
               <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gray-100 text-gray-400">
                 <BarChart3 size={14} />
               </span>
@@ -597,25 +597,25 @@ export default function SalesReportPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[10px] text-gray-500"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
               >
                 5 Hours
-                <ChevronDown size={11} />
+                <ChevronDown size={14} />
               </button>
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[10px] text-gray-500"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
               >
                 Today
-                <ChevronDown size={11} />
+                <ChevronDown size={14} />
               </button>
             </div>
           </div>
-          <div className="mt-2 text-xl font-semibold text-gray-900">
+          <div className="mt-4 text-2xl font-semibold text-gray-900">
             Rp 105.500.000
           </div>
           <div className="mt-4 flex gap-4">
-            <div className="flex w-10 flex-col justify-between text-[10px] text-gray-400">
+            <div className="flex w-10 flex-col justify-between text-xs text-gray-400">
               {costYAxis.map((label) => (
                 <span key={`rev-${label}`}>{label}</span>
               ))}
@@ -638,7 +638,7 @@ export default function SalesReportPage() {
                       style={{ height: `${Math.max(12, height - 20)}%` }}
                     />
                     {index === 5 ? (
-                      <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded bg-green-500 px-2 py-0.5 text-[9px] text-white">
+                      <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded bg-green-500 px-2 py-0.5 text-[10px] text-white">
                         Rp 50.000.000
                       </span>
                     ) : null}
@@ -646,14 +646,14 @@ export default function SalesReportPage() {
                   </div>
                 ))}
               </div>
-              <div className="mt-2 flex justify-between text-[9px] text-gray-400">
+              <div className="mt-2 flex justify-between text-xs text-gray-400">
                 {hours.map((label) => (
                   <span key={`rev-${label}`}>{label}</span>
                 ))}
               </div>
             </div>
           </div>
-          <div className="mt-3 flex items-center gap-4 text-[10px] text-gray-500">
+          <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
             <span className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-orange-200" />
               Paid Revenue
@@ -665,9 +665,9 @@ export default function SalesReportPage() {
           </div>
         </div>
 
-        <div className="col-span-12 rounded-lg border border-gray-200 bg-white p-4 shadow-sm lg:col-span-8">
+        <div className="col-span-12 rounded-xl border border-gray-200 bg-white p-4 lg:col-span-8">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[12px] text-gray-500">
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
               <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gray-100 text-gray-400">
                 <BarChart3 size={14} />
               </span>
@@ -676,32 +676,32 @@ export default function SalesReportPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[10px] text-gray-500"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
               >
                 5 Hours
-                <ChevronDown size={11} />
+                <ChevronDown size={14} />
               </button>
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[10px] text-gray-500"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
               >
                 Today
-                <ChevronDown size={11} />
+                <ChevronDown size={14} />
               </button>
             </div>
           </div>
-          <div className="mt-2 text-xl font-semibold text-gray-900">
+          <div className="mt-4 text-2xl font-semibold text-gray-900">
             Rp 105.500.000
           </div>
           <div className="mt-2 flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-600">
+            <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-600">
               +10.5%
-              <ArrowUpRight size={11} />
+              <ArrowUpRight size={13} />
             </span>
-            <span className="text-[10px] text-gray-400">Gross Profit</span>
+            <span className="text-xs text-gray-500">Gross Profit</span>
           </div>
           <div className="mt-4 flex gap-4">
-            <div className="flex w-10 flex-col justify-between text-[10px] text-gray-400">
+            <div className="flex w-10 flex-col justify-between text-xs text-gray-400">
               {costYAxis.map((label) => (
                 <span key={`gross-${label}`}>{label}</span>
               ))}
@@ -724,7 +724,7 @@ export default function SalesReportPage() {
                       style={{ height: `${Math.max(12, height - 18)}%` }}
                     />
                     {index === 5 ? (
-                      <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded bg-green-500 px-2 py-0.5 text-[9px] text-white">
+                      <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded bg-green-500 px-2 py-0.5 text-[10px] text-white">
                         Rp 50.000.000
                       </span>
                     ) : null}
@@ -732,14 +732,14 @@ export default function SalesReportPage() {
                   </div>
                 ))}
               </div>
-              <div className="mt-2 flex justify-between text-[9px] text-gray-400">
+              <div className="mt-2 flex justify-between text-xs text-gray-400">
                 {hours.map((label) => (
                   <span key={`gross-${label}`}>{label}</span>
                 ))}
               </div>
             </div>
           </div>
-          <div className="mt-3 flex items-center gap-4 text-[10px] text-gray-500">
+          <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
             <span className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-orange-200" />
               Paid Revenue
@@ -751,9 +751,9 @@ export default function SalesReportPage() {
           </div>
         </div>
 
-        <div className="col-span-12 rounded-lg border border-gray-200 bg-white p-4 shadow-sm lg:col-span-4">
+        <div className="col-span-12 rounded-xl border border-gray-200 bg-white p-4 lg:col-span-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[12px] text-gray-500">
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
               <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gray-100 text-gray-400">
                 <BarChart3 size={14} />
               </span>
@@ -762,31 +762,31 @@ export default function SalesReportPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[10px] text-gray-500"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
               >
                 Jan 3 - Jan 10
-                <ChevronDown size={11} />
+                <ChevronDown size={14} />
               </button>
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[10px] text-gray-500"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
               >
                 Weekly
-                <ChevronDown size={11} />
+                <ChevronDown size={14} />
               </button>
             </div>
           </div>
-          <div className="mt-2 text-xl font-semibold text-gray-900">
+          <div className="mt-4 text-2xl font-semibold text-gray-900">
             10,500
           </div>
-          <p className="text-[11px] text-gray-400">Produk Terlaris</p>
+          <p className="text-xs text-gray-500">Produk Terlaris</p>
           <div className="mt-4 space-y-4">
             {topProducts.map((product) => (
               <div key={product.label}>
-                <div className="flex items-center justify-between text-[11px] text-gray-500">
+                <div className="flex items-center justify-between text-xs text-gray-500">
                   <span>{product.label}</span>
                   {product.badge ? (
-                    <span className="rounded bg-green-500 px-1.5 text-[9px] text-white">
+                    <span className="rounded bg-green-500 px-1.5 text-[10px] text-white">
                       {product.badge}
                     </span>
                   ) : null}
@@ -803,7 +803,7 @@ export default function SalesReportPage() {
               </div>
             ))}
           </div>
-          <div className="mt-4 flex items-center justify-between text-[9px] text-gray-400">
+          <div className="mt-4 flex items-center justify-between text-xs text-gray-400">
             <span>0</span>
             <span>200</span>
             <span>500</span>
