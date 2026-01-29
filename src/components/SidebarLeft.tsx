@@ -209,10 +209,16 @@ export default function SidebarLeft({ role }: SidebarLeftProps) {
   const bottomItems = filteredItems.filter((i) => i.position === "bottom");
   const pathname = usePathname();
   const [openGroup, setOpenGroup] = useState<string | null>(null);
+  const activeGroupKey = useMemo(
+    () =>
+      topItems.find((item) => item.children?.some((child) => child.active))
+        ?.name ?? null,
+    [topItems]
+  );
 
   useEffect(() => {
-    setOpenGroup(null);
-  }, [pathname]);
+    setOpenGroup(activeGroupKey);
+  }, [activeGroupKey, pathname]);
 
   const handleToggleGroup = (groupKey: string) => {
     setOpenGroup((current) => (current === groupKey ? null : groupKey));

@@ -2,80 +2,54 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, RotateCw, Download, Plus } from "lucide-react";
+import AddRawMaterialModal from "@/components/modals/AddIngredient";
+import RawMaterialTable from "@/components/sections/IngredientTable";
 import Pagination from "@/components/ui/Pagination";
-import AddProductModal from "@/components/modals/AddProduct";
-import ViewProductModal from "@/components/modals/ViewProduct";
-import EditProductModal from "@/components/modals/EditProduct";
-import ProductsTable from "@/components/sections/ProductsTable";
 import {
-  buildProductsExportRows,
-  productsExportHeaders,
-} from "@/domain/masterdata/productsExport";
-import useMasterdataProducts from "@/lib/hooks/useMasterdataProducts";
+  buildIngredientsExportRows,
+  ingredientsExportHeaders,
+} from "@/domain/masterdata/ingredientsExport";
+import useMasterdataIngredients from "@/lib/hooks/useMasterdataIngredients";
 import { downloadCsv } from "@/lib/utils/csvExport";
-import type { ProductTableRow } from "@/types/masterdata";
+import type { RawMaterialRow } from "@/types/masterdata";
 
-const statusOptions = ["Semua Status", "Aktif", "Draft"];
-
-export default function ProductsPage() {
+export default function DashboardPage() {
   const [category, setCategory] = useState("Semua Kategori");
-  const [status, setStatus] = useState("Semua Status");
+  const [unit, setUnit] = useState("Semua Satuan");
   const [appliedCategory, setAppliedCategory] = useState("Semua Kategori");
-  const [appliedStatus, setAppliedStatus] = useState("Semua Status");
+  const [appliedUnit, setAppliedUnit] = useState("Semua Satuan");
   const [openCategory, setOpenCategory] = useState(false);
-  const [openStatus, setOpenStatus] = useState(false);
+  const [openUnit, setOpenUnit] = useState(false);
   const [openAddProduct, setOpenAddProduct] = useState(false);
-  const [openViewProduct, setOpenViewProduct] = useState(false);
-  const [openEditProduct, setOpenEditProduct] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<ProductTableRow | null>(
-    null
-  );
-  const { rows: products, categories, loading, error, reload } =
-    useMasterdataProducts();
+  const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
 
-  const handleApplyFilters = () => {
-    setAppliedCategory(category);
-    setAppliedStatus(status);
-    setPage(1);
-    setOpenCategory(false);
-    setOpenStatus(false);
-  };
+  const {
+    rows: ingredients,
+    categoryOptions,
+    unitOptions,
+    loading,
+    error,
+  } = useMasterdataIngredients();
 
-  const handleResetFilters = () => {
-    setCategory("Semua Kategori");
-    setStatus("Semua Status");
-    setAppliedCategory("Semua Kategori");
-    setAppliedStatus("Semua Status");
-    setPage(1);
-    setOpenCategory(false);
-    setOpenStatus(false);
-  };
-
-  const handleEdit = (item: ProductTableRow) => {
-    setSelectedProduct(item);
-    setOpenEditProduct(true);
-  };
-
-  const handleDelete = (item: ProductTableRow) => {
-    console.log("Delete product:", item);
-  };
-
-  const handleView = (item: ProductTableRow) => {
-    setSelectedProduct(item);
-    setOpenViewProduct(true);
-  };
-
-  const categoryOptions = useMemo(() => {
-    const labels =
-      categories.length > 0
-        ? categories.map((item) => item.label)
-        : Array.from(new Set(products.map((item) => item.category))).filter(
-            (label) => label && label !== "-",
-          );
-    return ["Semua Kategori", ...labels];
-  }, [categories, products]);
+  const filteredRows = useMemo<RawMaterialRow[]>(() => {
+    const query = search.trim().toLowerCase();
+    return ingredients
+      .filter((item) => {
+        const matchCategory =
+          appliedCategory === "Semua Kategori" ||
+          item.kategori === appliedCategory;
+        const matchUnit =
+          appliedUnit === "Semua Satuan" || item.satuan === appliedUnit;
+        const matchSearch =
+          !query ||
+          [item.skuInduk, item.kategori, item.namaBarang, item.satuan]
+            .filter(Boolean)
+            .some((value) => String(value).toLowerCase().includes(query));
+        return matchCategory && matchUnit && matchSearch;
+      });
+  }, [ingredients, appliedCategory, appliedUnit, search]);
 
   useEffect(() => {
     if (!categoryOptions.includes(category)) {
@@ -84,68 +58,88 @@ export default function ProductsPage() {
     if (!categoryOptions.includes(appliedCategory)) {
       setAppliedCategory("Semua Kategori");
     }
-  }, [category, categoryOptions, appliedCategory]);
+    if (!unitOptions.includes(unit)) {
+      setUnit("Semua Satuan");
+    }
+    if (!unitOptions.includes(appliedUnit)) {
+      setAppliedUnit("Semua Satuan");
+    }
+  }, [category, appliedCategory, unit, appliedUnit, categoryOptions, unitOptions]);
 
-  const filteredProducts = useMemo(() => {
-    return products.filter((item) => {
-      const matchCategory =
-        appliedCategory === "Semua Kategori" ||
-        item.category === appliedCategory;
-      const matchStatus =
-        appliedStatus === "Semua Status" || item.status === appliedStatus;
-      return matchCategory && matchStatus;
-    });
-  }, [products, appliedCategory, appliedStatus]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / perPage));
-  const pagedProducts = filteredProducts.slice(
+  const pagedRows = filteredRows.slice(
     (page - 1) * perPage,
-    page * perPage,
+    page * perPage
   );
 
+  const handleResetFilters = () => {
+    setCategory("Semua Kategori");
+    setUnit("Semua Satuan");
+    setAppliedCategory("Semua Kategori");
+    setAppliedUnit("Semua Satuan");
+    setSearch("");
+    setPage(1);
+    setOpenCategory(false);
+    setOpenUnit(false);
+  };
+
+  const handleApplyFilters = () => {
+    setAppliedCategory(category);
+    setAppliedUnit(unit);
+    setPage(1);
+    setOpenCategory(false);
+    setOpenUnit(false);
+  };
+
   const handleExportAll = () => {
-    const rows = buildProductsExportRows(products);
+    const rows = buildIngredientsExportRows(ingredients);
     downloadCsv({
-      filename: "products-all.csv",
-      headers: productsExportHeaders,
+      filename: "ingredients-all.csv",
+      headers: ingredientsExportHeaders,
       rows,
     });
   };
 
   const handleExportFilter = () => {
-    const rows = buildProductsExportRows(filteredProducts);
+    const rows = buildIngredientsExportRows(filteredRows);
     downloadCsv({
-      filename: "products-filter.csv",
-      headers: productsExportHeaders,
+      filename: "ingredients-filter.csv",
+      headers: ingredientsExportHeaders,
       rows,
     });
   };
 
-  useEffect(() => {
-    if (page > totalPages) {
-      setPage(totalPages);
-    }
-  }, [page, totalPages]);
+  const handleEdit = (item: RawMaterialRow) => {
+    console.log("Edit raw material:", item);
+  };
+
+  const handleDelete = (item: RawMaterialRow) => {
+    console.log("Delete raw material:", item);
+  };
+
+  const handleView = (item: RawMaterialRow) => {
+    console.log("View raw material:", item);
+  };
 
   return (
     <div className="min-h-screen space-y-6 p-4">
       {/* HEADER */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-medium">Daftar Products</h1>
+        <h1 className="text-3xl font-medium">Daftar Bahan Baku</h1>
 
         <div className="flex gap-2 p-2">
           <button
             type="button"
             onClick={() => setOpenAddProduct(true)}
-            className="flex items-center gap-2 rounded-md bg-orange-500 px-5 py-2 text-sm font-medium text-white hover:bg-orange-600"
+            className="h-9.5 flex items-center gap-2 rounded-md bg-orange-500 px-5 text-sm font-medium text-white hover:bg-orange-600"
           >
-            <Plus size={17} className="inline-block font-bold" />
-            Add Product
+            <Plus size={17} />
+            Add Bahan Baku
           </button>
+
           <button
             type="button"
             onClick={handleResetFilters}
-            className="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
+            className="flex items-center gap-2 bg-white rounded-md border  border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
           >
             <RotateCw size={17} className="inline-block font-bold" />
             Reset Filter
@@ -153,15 +147,16 @@ export default function ProductsPage() {
           <button
             type="button"
             onClick={handleExportAll}
-            className="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
+            className="flex items-center gap-2 bg-white rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
           >
             <Download size={17} className="inline-block font-bold" />
             Export All
           </button>
+          <div className="flex items-center gap-2 bg-white relative"></div>
           <button
             type="button"
             onClick={handleExportFilter}
-            className="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
+            className="flex items-center gap-2 bg-white rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
           >
             <Download size={17} className="inline-block font-bold" />
             Export Filter
@@ -170,7 +165,7 @@ export default function ProductsPage() {
       </div>
       <div className="border border-gray-200"></div>
 
-      {/* filter kategory n status */}
+      {/* filter kategory n label */}
       <div className="w-full rounded-lg border border-gray-200 bg-white p-4">
         <div className="flex flex-wrap items-center gap-6 p-2">
           {/* Filter Kategori */}
@@ -208,33 +203,32 @@ export default function ProductsPage() {
               )}
             </div>
           </div>
-
-          {/* Filter Status */}
-          <div className="flex flex-col gap-1">
+          {/* Filter satuan */}
+          <div className="flex flex-col gap-1 pl-5">
             <label className="text-base font-semibold text-gray-600">
-              Filter Status
+              Satuan
             </label>
             <div className="relative p-0.5">
               <button
                 type="button"
                 className="flex w-48 items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                onClick={() => setOpenStatus((v) => !v)}
+                onClick={() => setOpenUnit((v) => !v)}
               >
-                {status}
+                {unit}
                 <ChevronDown size={16} />
               </button>
-              {openStatus && (
+              {openUnit && (
                 <div className="absolute z-30  mt-1 w-full rounded-md border border-gray-200 bg-white shadow-md">
-                  {statusOptions.map((item) => (
+                  {unitOptions.map((item) => (
                     <button
                       key={item}
                       type="button"
                       onClick={() => {
-                        setStatus(item);
-                        setOpenStatus(false);
+                        setUnit(item);
+                        setOpenUnit(false);
                       }}
                       className={`block w-full px-3 py-2 text-left text-sm hover:bg-orange-50 ${
-                        status === item ? "font-semibold" : ""
+                        unit === item ? "font-semibold" : ""
                       }`}
                     >
                       {item}
@@ -244,20 +238,35 @@ export default function ProductsPage() {
               )}
             </div>
           </div>
-
           {/* Button Terapkan Filter */}
           <button
             type="button"
             onClick={handleApplyFilters}
-            className="rounded-md bg-orange-500 px-8 py-2 text-sm font-medium text-white hover:bg-orange-600"
+            className=" h-8.75 rounded-md bg-orange-500 px-4 text-sm font-medium text-white hover:bg-orange-600"
           >
             Terapkan Filter
           </button>
         </div>
       </div>
+      {/* Search input and button */}
+      <div className="flex items-center gap-2 mt-4">
+        <label className="text-sm text-gray-700 mr-2">Search :</label>
+        <input
+          type="text"
+          placeholder=""
+          value={search}
+          onChange={(event) => {
+            setSearch(event.target.value);
+            setPage(1);
+          }}
+          className="flex-1 min-w-75 rounded-md border bg-white border-gray-300 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-200"
+        />
+        {/* Jika ingin button search, tambahkan di sini */}
+        {/* <button className="ml-2 rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600">Search</button> */}
+      </div>
 
-      <ProductsTable
-        rows={pagedProducts}
+      <RawMaterialTable
+        rows={pagedRows}
         loading={loading}
         error={error}
         page={page}
@@ -266,42 +275,28 @@ export default function ProductsPage() {
         onDelete={handleDelete}
         onView={handleView}
       />
-
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-[#3f2f23]">
         <p className="font-bold">
           Data ditampilkan{" "}
           <span className="font-bold text-[#3f2f23]">
-            {loading ? 0 : Math.min(page * perPage, filteredProducts.length)}
+            {Math.min(page * perPage, filteredRows.length)}
           </span>{" "}
           dari{" "}
           <span className="font-bold text-[#3f2f23]">
-            {loading ? 0 : filteredProducts.length}
+            {filteredRows.length}
           </span>
         </p>
-
         <Pagination
           page={page}
           setPage={setPage}
-          total={filteredProducts.length}
+          total={filteredRows.length}
           perPage={perPage}
           setPerPage={setPerPage}
         />
       </div>
-
-      <AddProductModal
+      <AddRawMaterialModal
         open={openAddProduct}
         onClose={() => setOpenAddProduct(false)}
-      />
-      <ViewProductModal
-        open={openViewProduct}
-        onClose={() => setOpenViewProduct(false)}
-        product={selectedProduct}
-      />
-      <EditProductModal
-        open={openEditProduct}
-        onClose={() => setOpenEditProduct(false)}
-        onUpdated={reload}
-        product={selectedProduct}
       />
     </div>
   );

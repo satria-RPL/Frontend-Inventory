@@ -35,7 +35,7 @@ export default function HistoryOrderSearchBar() {
   };
 
   return (
-    <div className="relative w-full max-w-[520px]">
+    <div className="relative w-full max-w-130">
       <Search
         size={16}
         className="absolute left-3 top-1/2 -translate-y-1/2 text-(--background-dark)"

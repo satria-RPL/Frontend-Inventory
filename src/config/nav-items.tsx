@@ -31,9 +31,9 @@ export const useNavItems = (): NavItem[] => {
     },
     {
       name: "Bahan Baku",
-      href: "/main/masterdata/raw-material",
+      href: "/main/masterdata/ingredient",
       icon: <span>•</span>,
-      active: isChildActive("/main/masterdata/raw-material"),
+      active: isChildActive("/main/masterdata/ingredient"),
       position: "top",
     },
     {

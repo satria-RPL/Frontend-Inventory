@@ -32,14 +32,14 @@ async function clientRequest<T = unknown>(path: string): Promise<ApiResult<T>> {
   }
 }
 
-export function fetchMenusClient() {
-  return clientRequest("/api/menus");
+export function fetchIngredientsClient() {
+  return clientRequest("/api/ingredients");
 }
 
-export function fetchMenuPricesClient() {
-  return clientRequest("/api/menu-prices");
+export function fetchUnitsClient() {
+  return clientRequest("/api/units");
 }
 
-export function fetchCategoriesClient() {
-  return clientRequest("/api/categories");
+export function fetchPlaceStocksClient() {
+  return clientRequest("/api/place-stocks");
 }

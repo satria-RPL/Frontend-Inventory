@@ -1,25 +1,128 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, RotateCw, Download, Plus } from "lucide-react";
-import OrderHistoryView from "@/components/sections/OrderHistoryView";
 import AddProductModal from "@/components/modals/AddProduct";
+import AddOnsTable from "@/components/sections/AddOnsTable";
+import Pagination from "@/components/ui/Pagination";
+import {
+  addOnsExportHeaders,
+  buildAddOnsExportRows,
+} from "@/domain/masterdata/addOnsExport";
+import useMasterdataAddOns from "@/lib/hooks/useMasterdataAddOns";
+import { downloadCsv } from "@/lib/utils/csvExport";
+import type { AddOnRow } from "@/types/masterdata";
 
-const categories = ["Semua Kategori", "Makanan", "Minuman", "Snack"];
-const labels = ["Semua Label", "Best Seller", "Promo", "New"];
-const nameOptions = ["Semua Nama", "Saos", "Mayones", "Keju"];
-const unitOptions = ["Semua Satuan", "Pcs", "Pack", "Gram"];
+type FilterState = {
+  category: string;
+  search: string;
+};
+
+type DropdownKey = "category";
+
+const defaultFilters: FilterState = {
+  category: "Semua Kategori",
+  search: "",
+};
 
 export default function DashboardPage() {
-  const [category, setCategory] = useState("Semua Kategori");
-  const [label, setLabel] = useState("Semua Label");
-  const [name, setName] = useState("Semua Nama");
-  const [unit, setUnit] = useState("Semua Satuan");
-  const [openCategory, setOpenCategory] = useState(false);
-  const [openLabel, setOpenLabel] = useState(false);
-  const [openName, setOpenName] = useState(false);
-  const [openUnit, setOpenUnit] = useState(false);
+  const [filters, setFilters] = useState(defaultFilters);
+  const [appliedFilters, setAppliedFilters] = useState(defaultFilters);
+  const [openDropdown, setOpenDropdown] = useState<DropdownKey | null>(null);
   const [openAddProduct, setOpenAddProduct] = useState(false);
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+  const { rows, categoryOptions, loading, error } = useMasterdataAddOns();
+
+  const filteredRows = useMemo(() => {
+    const normalizedSearch = appliedFilters.search.trim().toLowerCase();
+
+    return rows.filter((item) => {
+      const matchCategory =
+        appliedFilters.category === "Semua Kategori" ||
+        item.category === appliedFilters.category;
+      const matchSearch =
+        normalizedSearch === "" ||
+        [item.sku, item.name, item.category]
+          .filter(Boolean)
+          .some((value) =>
+            String(value).toLowerCase().includes(normalizedSearch)
+          );
+
+      return matchCategory && matchSearch;
+    });
+  }, [appliedFilters, rows]);
+
+  const totalRows = filteredRows.length;
+  const totalPages = Math.max(1, Math.ceil(totalRows / perPage));
+  const pagedRows = useMemo(() => {
+    const startIndex = (page - 1) * perPage;
+    return filteredRows.slice(startIndex, startIndex + perPage);
+  }, [filteredRows, page, perPage]);
+
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
+
+  const toggleDropdown = (key: DropdownKey) => {
+    setOpenDropdown((current) => (current === key ? null : key));
+  };
+
+  const handleSelectFilter = (key: keyof FilterState, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+    setOpenDropdown(null);
+  };
+
+  const handleApplyFilters = () => {
+    setAppliedFilters(filters);
+    setPage(1);
+    setOpenDropdown(null);
+  };
+
+  const handleResetFilters = () => {
+    setFilters(defaultFilters);
+    setAppliedFilters(defaultFilters);
+    setPage(1);
+    setOpenDropdown(null);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setFilters((prev) => ({ ...prev, search: value }));
+    setAppliedFilters((prev) => ({ ...prev, search: value }));
+    setPage(1);
+  };
+
+  const handleExportAll = () => {
+    const exportRows = buildAddOnsExportRows(rows);
+    downloadCsv({
+      filename: "add-ons-all.csv",
+      headers: addOnsExportHeaders,
+      rows: exportRows,
+    });
+  };
+
+  const handleExportFilter = () => {
+    const exportRows = buildAddOnsExportRows(filteredRows);
+    downloadCsv({
+      filename: "add-ons-filter.csv",
+      headers: addOnsExportHeaders,
+      rows: exportRows,
+    });
+  };
+
+  const handleEdit = (item: AddOnRow) => {
+    console.log("Edit add-ons:", item);
+  };
+
+  const handleDelete = (item: AddOnRow) => {
+    console.log("Delete add-ons:", item);
+  };
+
+  const handleView = (item: AddOnRow) => {
+    console.log("View add-ons:", item);
+  };
 
   return (
     <div className="min-h-screen space-y-6 p-4">
@@ -34,27 +137,38 @@ export default function DashboardPage() {
             className="h-9.5 flex items-center gap-2 rounded-md bg-orange-500 px-5 text-sm font-medium text-white hover:bg-orange-600"
           >
             <Plus size={17} />
-            Add Product
+            Add Additional Items
           </button>
 
-          <button className="flex items-center gap-2 bg-white rounded-md border  border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50">
+          <button
+            type="button"
+            onClick={handleResetFilters}
+            className="flex items-center gap-2 bg-white rounded-md border  border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
+          >
             <RotateCw size={17} className="inline-block font-bold" />
             Reset Filter
           </button>
-          <div className="flex items-center gap-2 bg-white rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50">
+          <button
+            type="button"
+            onClick={handleExportAll}
+            className="flex items-center gap-2 bg-white rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
+          >
             <Download size={17} className="inline-block font-bold" />
             Export All
-          </div>
-          <div className="flex items-center gap-2 bg-white relative"></div>
-          <div className="flex items-center gap-2 bg-white rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50">
+          </button>
+          <button
+            type="button"
+            onClick={handleExportFilter}
+            className="flex items-center gap-2 bg-white rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
+          >
             <Download size={17} className="inline-block font-bold" />
             Export Filter
-          </div>
+          </button>
         </div>
       </div>
       <div className="border border-gray-200"></div>
 
-      {/* filter kategory n label */}
+      {/* filter kategori */}
       <div className="w-full rounded-lg border border-gray-200 bg-white p-4">
         <div className="flex flex-wrap items-center gap-6 p-2">
           {/* Filter Kategori */}
@@ -66,128 +180,22 @@ export default function DashboardPage() {
               <button
                 type="button"
                 className="flex w-48 items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                onClick={() => setOpenCategory((v) => !v)}
+                onClick={() => toggleDropdown("category")}
               >
-                {category}
+                {filters.category}
                 <ChevronDown size={16} />
               </button>
-              {openCategory && (
+              {openDropdown === "category" && (
                 <div className="absolute z-30 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-md">
-                  {categories.map((item) => (
+                  {categoryOptions.map((item) => (
                     <button
                       key={item}
                       type="button"
                       onClick={() => {
-                        setCategory(item);
-                        setOpenCategory(false);
+                        handleSelectFilter("category", item);
                       }}
                       className={`block w-full px-3 py-2 text-left text-sm hover:bg-gray-100 ${
-                        category === item ? "bg-orange-50 font-semibold" : ""
-                      }`}
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-          {/* Filter Label */}
-          <div className="flex flex-col gap-1 px-5">
-            <label className="text-base font-semibold text-gray-600">
-              Filter Label
-            </label>
-            <div className="relative p-0.5">
-              <button
-                type="button"
-                className="flex w-48 items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                onClick={() => setOpenLabel((v) => !v)}
-              >
-                {label}
-                <ChevronDown size={16} />
-              </button>
-              {openLabel && (
-                <div className="absolute z-30  mt-1 w-full rounded-md border border-gray-200 bg-white shadow-md">
-                  {labels.map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => {
-                        setLabel(item);
-                        setOpenLabel(false);
-                      }}
-                      className={`block w-full px-3 py-2 text-left text-sm hover:bg-gray-100 ${
-                        label === item ? "bg-gray-50 font-normal" : ""
-                      }`}
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-          {/* Filter nama barang */}
-          <div className="flex flex-col gap-1 px-5">
-            <label className="text-base font-semibold text-gray-600">
-              Nama Barang
-            </label>
-            <div className="relative p-0.5">
-              <button
-                type="button"
-                className="flex w-48 items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                onClick={() => setOpenName((v) => !v)}
-              >
-                {name}
-                <ChevronDown size={16} />
-              </button>
-              {openName && (
-                <div className="absolute z-30  mt-1 w-full rounded-md border border-gray-200 bg-white shadow-md">
-                  {nameOptions.map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => {
-                        setName(item);
-                        setOpenName(false);
-                      }}
-                      className={`block w-full px-3 py-2 text-left text-sm hover:bg-gray-100 ${
-                        name === item ? "bg-gray-50 font-normal" : ""
-                      }`}
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-          {/* Filter satuan */}
-          <div className="flex flex-col gap-1 pl-5">
-            <label className="text-base font-semibold text-gray-600">
-              Satuan
-            </label>
-            <div className="relative p-0.5">
-              <button
-                type="button"
-                className="flex w-48 items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                onClick={() => setOpenUnit((v) => !v)}
-              >
-                {unit}
-                <ChevronDown size={16} />
-              </button>
-              {openUnit && (
-                <div className="absolute z-30  mt-1 w-full rounded-md border border-gray-200 bg-white shadow-md">
-                  {unitOptions.map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => {
-                        setUnit(item);
-                        setOpenUnit(false);
-                      }}
-                      className={`block w-full px-3 py-2 text-left text-sm hover:bg-gray-100 ${
-                        unit === item ? "bg-gray-50 font-normal" : ""
+                        filters.category === item ? "bg-orange-50 font-semibold" : ""
                       }`}
                     >
                       {item}
@@ -200,12 +208,7 @@ export default function DashboardPage() {
           {/* Button Terapkan Filter */}
           <button
             type="button"
-            onClick={() => {
-              console.log("Kategori:", category);
-              console.log("Label:", label);
-              console.log("Nama:", name);
-              console.log("Satuan:", unit);
-            }}
+            onClick={handleApplyFilters}
             className=" h-8.75 rounded-md bg-orange-500 px-4 text-sm font-medium text-white hover:bg-orange-600"
           >
             Terapkan Filter
@@ -218,14 +221,45 @@ export default function DashboardPage() {
         <input
           type="text"
           placeholder=""
+          value={filters.search}
+          onChange={(event) => handleSearchChange(event.target.value)}
           className="flex-1 min-w-75 rounded-md border bg-white border-gray-300 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-200"
         />
         {/* Jika ingin button search, tambahkan di sini */}
         {/* <button className="ml-2 rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600">Search</button> */}
       </div>
 
-      {/* Table History Order */}
-      <OrderHistoryView />
+      <AddOnsTable
+        rows={pagedRows}
+        loading={loading}
+        error={error}
+        page={page}
+        perPage={perPage}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onView={handleView}
+      />
+
+      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-[#3f2f23]">
+        <p className="font-bold">
+          Data ditampilkan{" "}
+          <span className="font-bold text-[#3f2f23]">
+            {Math.min(page * perPage, filteredRows.length)}
+          </span>{" "}
+          dari{" "}
+          <span className="font-bold text-[#3f2f23]">
+            {filteredRows.length}
+          </span>
+        </p>
+
+        <Pagination
+          page={page}
+          setPage={setPage}
+          total={filteredRows.length}
+          perPage={perPage}
+          setPerPage={setPerPage}
+        />
+      </div>
       <AddProductModal
         open={openAddProduct}
         onClose={() => setOpenAddProduct(false)}
