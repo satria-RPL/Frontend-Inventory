@@ -47,9 +47,7 @@ export default function OrderHistoryView({
   const totalRows = total ?? sourceRows.length;
 
   const pagedRows = useMemo(() => {
-    if (!paginateClientSide) {
-      return sourceRows;
-    }
+    if (!paginateClientSide) return sourceRows;
     const start = (resolvedPage - 1) * resolvedPerPage;
     return sourceRows.slice(start, start + resolvedPerPage);
   }, [paginateClientSide, sourceRows, resolvedPage, resolvedPerPage]);
@@ -80,7 +78,6 @@ export default function OrderHistoryView({
           onDelete={onDelete}
           onView={onView}
         />
-        <OrderTable />
       </div>
     </div>
   );
