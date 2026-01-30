@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 import type { LoginFormAction, LoginFormState } from "../../../types/login";
 
@@ -15,6 +16,7 @@ type LoginFormViewProps = {
 export function LoginFormView({ action }: LoginFormViewProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [state, formAction] = useActionState(action, initialState);
 
   return (
@@ -79,7 +81,7 @@ export function LoginFormView({ action }: LoginFormViewProps) {
                   className="mx-3"
                 />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   inputMode="numeric"
                   name="password"
                   placeholder="PIN"
@@ -89,6 +91,15 @@ export function LoginFormView({ action }: LoginFormViewProps) {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                 />
+                <button
+                  type="button"
+                  className="px-3 text-gray-600 hover:text-gray-900 outline-none"
+                  aria-label={showPassword ? "Sembunyikan PIN" : "Tampilkan PIN"}
+                  aria-pressed={showPassword}
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
               {state?.error && (
                 <p className="mt-2 text-sm text-red-600" role="alert">

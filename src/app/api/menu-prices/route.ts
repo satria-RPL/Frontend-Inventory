@@ -15,16 +15,32 @@ export async function GET(request: NextRequest) {
   }
 
   const authPayload = await getAuthTokenFromCookie();
-  if (!authPayload?.token) {
+  let token = authPayload?.token ?? null;
+  let tokenType = authPayload?.tokenType ?? "Bearer";
+
+  if (!token) {
+    const rawCookie = request.cookies.get("auth_token")?.value ?? null;
+    if (rawCookie) {
+      try {
+        const parsed = JSON.parse(rawCookie) as { token?: string; tokenType?: string };
+        token = parsed.token ?? rawCookie;
+        tokenType = parsed.tokenType ?? tokenType;
+      } catch {
+        token = rawCookie;
+      }
+    }
+  }
+
+  if (!token) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   const url = new URL(request.url);
-  const backendUrl = `${normalizedApiBaseUrl}/api/menu-variants${url.search}`;
+  const backendUrl = `${normalizedApiBaseUrl}/api/menu-prices${url.search}`;
 
   const headers: HeadersInit = {
     Accept: "application/json",
-    Authorization: `${authPayload.tokenType ?? "Bearer"} ${authPayload.token}`,
+    Authorization: `${tokenType} ${token}`,
   };
 
   try {
@@ -39,7 +55,7 @@ export async function GET(request: NextRequest) {
       const message =
         data && typeof data === "object" && "message" in data
           ? String((data as { message?: unknown }).message)
-          : "Gagal memuat varian.";
+          : "Gagal memuat harga menu.";
       return NextResponse.json({ message, data }, { status: res.status });
     }
 
@@ -61,16 +77,32 @@ export async function POST(request: NextRequest) {
   }
 
   const authPayload = await getAuthTokenFromCookie();
-  if (!authPayload?.token) {
+  let token = authPayload?.token ?? null;
+  let tokenType = authPayload?.tokenType ?? "Bearer";
+
+  if (!token) {
+    const rawCookie = request.cookies.get("auth_token")?.value ?? null;
+    if (rawCookie) {
+      try {
+        const parsed = JSON.parse(rawCookie) as { token?: string; tokenType?: string };
+        token = parsed.token ?? rawCookie;
+        tokenType = parsed.tokenType ?? tokenType;
+      } catch {
+        token = rawCookie;
+      }
+    }
+  }
+
+  if (!token) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  const backendUrl = `${normalizedApiBaseUrl}/api/menu-variants`;
+  const backendUrl = `${normalizedApiBaseUrl}/api/menu-prices`;
 
   const headers: HeadersInit = {
     Accept: "application/json",
     "Content-Type": "application/json",
-    Authorization: `${authPayload.tokenType ?? "Bearer"} ${authPayload.token}`,
+    Authorization: `${tokenType} ${token}`,
   };
 
   const body = await request.json().catch(() => null);
@@ -88,7 +120,7 @@ export async function POST(request: NextRequest) {
       const message =
         data && typeof data === "object" && "message" in data
           ? String((data as { message?: unknown }).message)
-          : "Gagal membuat varian menu.";
+          : "Gagal membuat harga menu.";
       return NextResponse.json({ message, data }, { status: res.status });
     }
 

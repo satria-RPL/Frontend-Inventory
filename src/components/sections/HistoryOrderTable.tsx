@@ -1,21 +1,46 @@
 "use client";
 
-import { useState } from "react";
 import { Eye, Trash2 } from "lucide-react";
-import { dummyProducts } from "@/data/historyproduct";
 import Pagination from "@/components/ui/Pagination";
 
-export default function HistoryOrderTable() {
-  // ==============================
-  // STATE: Pagination
-  // ==============================
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
+export type HistoryOrderRow = {
+  id: number | string;
+  sku: string;
+  namaProduk: string;
+  packaging: string;
+  kategori: string;
+  label: string;
+  dibuat: string;
+};
 
-  // ==============================
-  // DATA: Slice data sesuai page
-  // ==============================
-  const paged = dummyProducts.slice((page - 1) * perPage, page * perPage);
+type HistoryOrderTableProps = {
+  rows: HistoryOrderRow[];
+  total: number;
+  page: number;
+  perPage: number;
+  setPage: (n: number) => void;
+  setPerPage: (n: number) => void;
+  loading?: boolean;
+  error?: string | null;
+  emptyMessage?: string;
+  onDelete?: (row: HistoryOrderRow) => void;
+  onView?: (row: HistoryOrderRow) => void;
+};
+
+export default function HistoryOrderTable({
+  rows,
+  total,
+  page,
+  perPage,
+  setPage,
+  setPerPage,
+  loading = false,
+  error = null,
+  emptyMessage = "Data tidak ditemukan.",
+  onDelete,
+  onView,
+}: HistoryOrderTableProps) {
+  const startIndex = (page - 1) * perPage;
 
   return (
     <div className="flex h-full min-h-0 flex-col rounded-2xl">
@@ -33,7 +58,7 @@ export default function HistoryOrderTable() {
           <thead className="sticky top-0 z-10 bg-gray-100 border border-gray-200">
             <tr className="text-left text-xs font-medium border border-gray-200 text-[#9a9a9a]">
               <th className="px-4 py-3 text-center">#</th>
-              <th className="px-4 py-3">SKU</th>
+              <th className="px-4 py-3">SKU Induk</th>
               <th className="px-4 py-3">Nama Produk</th>
               <th className="px-4 py-3">Packaging</th>
               <th className="px-4 py-3">Kategori</th>
@@ -47,20 +72,42 @@ export default function HistoryOrderTable() {
               TABLE BODY
               ============================== */}
           <tbody className="text-[#6f6f6f]">
-            {/* Empty State */}
-            {paged.length === 0 && (
+            {loading && (
               <tr>
                 <td
                   colSpan={8}
                   className="py-8 text-center text-sm text-[#9a9a9a]"
                 >
-                  Data tidak ditemukan.
+                  Memuat data...
                 </td>
               </tr>
             )}
 
-            {/* Data Rows */}
-            {paged.map((item, index) => (
+            {!loading && error && (
+              <tr>
+                <td
+                  colSpan={8}
+                  className="py-8 text-center text-sm text-red-500"
+                >
+                  {error}
+                </td>
+              </tr>
+            )}
+
+            {!loading && !error && rows.length === 0 && (
+              <tr>
+                <td
+                  colSpan={8}
+                  className="py-8 text-center text-sm text-[#9a9a9a]"
+                >
+                  {emptyMessage}
+                </td>
+              </tr>
+            )}
+
+            {!loading &&
+              !error &&
+              rows.map((item, index) => (
               <tr
                 key={item.id}
                 className="
@@ -73,7 +120,7 @@ export default function HistoryOrderTable() {
               >
                 {/* Nomor urut global */}
                 <td className="px-4 py-3 text-center">
-                  {(page - 1) * perPage + index + 1}
+                  {startIndex + index + 1}
                 </td>
 
                 <td className="px-4 py-3 font-medium">{item.sku}</td>
@@ -98,7 +145,7 @@ export default function HistoryOrderTable() {
                       className="flex h-7 w-7 items-center justify-center rounded-md bg-[#ef4444] text-white hover:opacity-90"
                       title="Delete"
                       type="button"
-                      onClick={() => alert("Delete dummy row id: " + item.id)}
+                      onClick={() => onDelete?.(item)}
                     >
                       <Trash2 size={14} />
                     </button>
@@ -108,7 +155,7 @@ export default function HistoryOrderTable() {
                       className="flex h-7 w-7 items-center justify-center rounded-md bg-[#22c55e] text-white hover:opacity-90"
                       title="View"
                       type="button"
-                      onClick={() => alert("Detail dummy row id: " + item.id)}
+                      onClick={() => onView?.(item)}
                     >
                       <Eye size={14} />
                     </button>
@@ -129,18 +176,18 @@ export default function HistoryOrderTable() {
         <p>
           Data ditampilkan{" "}
           <span className="font-bold text-[#3f2f23]">
-            {Math.min(page * perPage, dummyProducts.length)}
+            {Math.min(page * perPage, total)}
           </span>{" "}
           dari{" "}
           <span className="font-bold text-[#3f2f23]">
-            {dummyProducts.length}
+            {total}
           </span>
         </p>
 
         <Pagination
           page={page}
           setPage={setPage}
-          total={dummyProducts.length}
+          total={total}
           perPage={perPage}
           setPerPage={setPerPage}
         />
