@@ -266,7 +266,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Tanggal Dari */}
-          <div className="flex flex-col gap-1 px-5">
+          <div className="flex flex-col gap-1">
             <label className="text-base font-semibold text-gray-600">
               Tanggal Dari
             </label>
@@ -284,7 +284,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Tanggal Sampai */}
-          <div className="flex flex-col gap-1 px-5">
+          <div className="flex flex-col gap-1 px-3">
             <label className="text-base font-semibold text-gray-600">
               Tanggal Sampai
             </label>

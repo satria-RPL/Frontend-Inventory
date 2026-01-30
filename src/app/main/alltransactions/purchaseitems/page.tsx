@@ -49,7 +49,7 @@ export default function DashboardPage() {
           <button
             type="button"
             onClick={() => setOpenAddProduct(true)}
-            className="h-[38px] flex items-center gap-2 rounded-md bg-orange-500 px-5 text-sm font-medium text-white hover:bg-orange-600"
+            className="h-[38px] flex items-center gap-2 rounded-md bg-orange-500 px-3 text-sm font-medium text-white hover:bg-orange-600"
           >
             <Plus size={17} />
             Add Purchase
@@ -111,7 +111,7 @@ export default function DashboardPage() {
             </div>
           </div>
           {/* Filter Label */}
-          <div className="flex flex-col gap-1 px-5">
+          <div className="flex flex-col gap-1 px-3">
             <label className="text-base font-semibold text-gray-600">
               Filter Items
             </label>
@@ -146,7 +146,7 @@ export default function DashboardPage() {
             </div>
           </div>
           {/* Filter Tanggal Dari */}
-          <div className="flex flex-col gap-1 px-5">
+          <div className="flex flex-col gap-1 px-3">
             <label className="text-base font-semibold text-gray-600">
               Tanggal Dari
             </label>
@@ -163,7 +163,7 @@ export default function DashboardPage() {
             </div>
           </div>
           {/* Filter Tanggal Sampai */}
-          <div className="flex flex-col gap-1 px-5">
+          <div className="flex flex-col gap-1 px-3">
             <label className="text-base font-semibold text-gray-600">
               Tanggal Sampai
             </label>

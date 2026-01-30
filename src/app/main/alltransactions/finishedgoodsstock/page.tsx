@@ -140,7 +140,7 @@ export default function DashboardPage() {
                   <ChevronDown size={16} />
                 </button>
                 {openNamaBarang && (
-                  <div className="absolute z-30 mt-1 w-full rounded-md border border-gray-300 bg-white shadow-md">
+                  <div className="absolute z-40 mt-1 w-full rounded-md border border-gray-300 bg-white shadow-md">
                     {namaBarangList.map((item) => (
                       <button
                         key={item}

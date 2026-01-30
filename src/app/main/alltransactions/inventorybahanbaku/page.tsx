@@ -116,7 +116,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Nama Barang */}
-          <div className="flex flex-col gap-1 px-5">
+          <div className="flex flex-col gap-1 px-3">
             <label className="text-base font-semibold text-gray-600">
               Nama Barang
             </label>
@@ -152,7 +152,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Kategori */}
-          <div className="flex flex-col gap-1 px-5">
+          <div className="flex flex-col gap-1 px-3">
             <label className="text-base font-semibold text-gray-600">
               Kategori
             </label>
@@ -188,7 +188,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Filter Bulan */}
-          <div className="flex flex-col gap-1 px-5">
+          <div className="flex flex-col gap-1 px-3">
             <label className="text-base font-semibold text-gray-600">
               Filter Bulan
             </label>

@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import OrderTable, { type HistoryOrderRow } from "@/components/sections/HistoryOrderTable";
+import OrderTable, {
+  type HistoryOrderRow,
+} from "@/components/sections/HistoryOrderTable";
 import { dummyProducts } from "@/data/historyproduct";
 
 type OrderHistoryViewProps = {
@@ -63,21 +65,23 @@ export default function OrderHistoryView({
   }, [resolvedPage, resolvedSetPage, totalPages]);
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] flex-col gap-4 px-4 py-4">
+    <div className="flex h-[calc(100vh-8rem)] flex-col gap-4">
       <div className="flex-1 overflow-hidden">
-        <OrderTable
-          rows={pagedRows}
-          total={totalRows}
-          page={resolvedPage}
-          perPage={resolvedPerPage}
-          setPage={resolvedSetPage}
-          setPerPage={resolvedSetPerPage}
-          loading={loading}
-          error={error}
-          emptyMessage={emptyMessage}
-          onDelete={onDelete}
-          onView={onView}
-        />
+        <div className="w-full rounded-3xl">
+          <OrderTable
+            rows={pagedRows}
+            total={totalRows}
+            page={resolvedPage}
+            perPage={resolvedPerPage}
+            setPage={resolvedSetPage}
+            setPerPage={resolvedSetPerPage}
+            loading={loading}
+            error={error}
+            emptyMessage={emptyMessage}
+            onDelete={onDelete}
+            onView={onView}
+          />
+        </div>
       </div>
     </div>
   );

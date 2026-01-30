@@ -29,7 +29,7 @@ export default function DashboardPage() {
     <div
       ref={ref}
       onClick={onClick}
-      className="flex items-center w-55 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
+      className="flex items-center w-50 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
     >
       <span className="flex-1">{value || "dd / mm / yyyy"}</span>
       {/*  */}
@@ -83,7 +83,7 @@ export default function DashboardPage() {
             <div className="relative p-0.5">
               <button
                 type="button"
-                className="flex w-55 items-center justify-between rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                className="flex w-50 items-center justify-between rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                 onClick={() => setOpenCategory((v) => !v)}
               >
                 {category}
@@ -111,14 +111,14 @@ export default function DashboardPage() {
             </div>
           </div>
           {/* Filter Status */}
-          <div className="flex flex-col gap-1 px-5">
+          <div className="flex flex-col gap-1 px-3">
             <label className="text-base font-semibold text-gray-600">
               Status
             </label>
             <div className="relative p-0.5">
               <button
                 type="button"
-                className="flex w-55 items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                className="flex w-50 items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
                 onClick={() => setOpenLabel((v) => !v)}
               >
                 {label}
@@ -146,7 +146,7 @@ export default function DashboardPage() {
             </div>
           </div>
           {/* Filter Tanggal Dari */}
-          <div className="flex flex-col gap-1 px-5">
+          <div className="flex flex-col gap-1 px-3">
             <label className="text-base font-semibold text-gray-600">
               Tanggal Dari
             </label>
@@ -163,7 +163,7 @@ export default function DashboardPage() {
             </div>
           </div>
           {/* Filter Tanggal Sampai */}
-          <div className="flex flex-col gap-1 px-5">
+          <div className="flex flex-col gap-1 px-3">
             <label className="text-base font-semibold text-gray-600">
               Tanggal Sampai
             </label>

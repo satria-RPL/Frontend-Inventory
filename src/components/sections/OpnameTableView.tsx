@@ -21,7 +21,7 @@ export default function OrderHistoryView({
     useState<SortValue>("newest");
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] flex-col gap-4 px-4 py-4">
+    <div className="flex h-[calc(100vh-8rem)] flex-col gap-4">
       <div className="flex-1 overflow-hidden">
         <OrderTable />
       </div>

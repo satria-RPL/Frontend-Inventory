@@ -50,8 +50,8 @@ export default function HistoryOrderTable({
           - Scrollable
           - Sticky header
          ============================== */}
-      <div className="relative min-h-0 flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden rounded-3xl bg-white border-2 border-gray-200">
-        <table className="w-full border-separate border-spacing-0 text-sm">
+      <div className="relative min-h-0 flex-1 overflow-y-auto rounded-3xl bg-white border-2 border-gray-200 w-full [&::-webkit-scrollbar]:hidden">
+        <table className="w-full min-w-full border-separate border-spacing-0 text-sm">
           {/* ==============================
               TABLE HEADER
               ============================== */}
