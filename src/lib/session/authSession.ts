@@ -87,8 +87,17 @@ export async function getAuthTokenFromCookie(): Promise<{
   const payload = await getAuthCookiePayload();
   if (!payload?.token) return null;
 
+  const rawToken = payload.token.trim();
+  const bearerPrefix = /^bearer\s+/i;
+  if (bearerPrefix.test(rawToken)) {
+    return {
+      token: rawToken.replace(bearerPrefix, "").trim(),
+      tokenType: "Bearer",
+    };
+  }
+
   return {
-    token: payload.token,
+    token: rawToken,
     tokenType: payload.tokenType ?? "Bearer",
   };
 }

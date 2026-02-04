@@ -107,23 +107,6 @@ export const useNavItems = (): NavItem[] => {
     },
   ];
 
-  const reportsChildren: NavItem[] = [
-    {
-      name: "Laporan Purchase",
-      href: "/main/reports/laporan-purchase",
-      icon: <span>•</span>,
-      active: isChildActive("/main/reports/laporan-purchase"),
-      position: "top",
-    },
-    {
-      name: "Laporan Catatan Produksi",
-      href: "/main/reports/laporan-catatan-produksi",
-      icon: <span>•</span>,
-      active: isChildActive("/main/reports/laporan-catatan-produksi"),
-      position: "top",
-    },
-  ];
-
   const managementChildren: NavItem[] = [
     {
       name: "Users",
@@ -137,13 +120,6 @@ export const useNavItems = (): NavItem[] => {
       href: "/main/management/roles",
       icon: <span>•</span>,
       active: isChildActive("/main/management/roles"),
-      position: "top",
-    },
-    {
-      name: "Permissions",
-      href: "/main/management/permissions",
-      icon: <span>•</span>,
-      active: isChildActive("/main/management/permissions"),
       position: "top",
     },
   ];
@@ -185,9 +161,8 @@ export const useNavItems = (): NavItem[] => {
       name: "Reports",
       href: "/main/reports",
       icon: <ChartBar size={20} />,
-      active: pathname === "/main/reports" || isParentActive(reportsChildren),
+      active: pathname.startsWith("/main/reports"),
       position: "top",
-      children: reportsChildren,
     },
     {
       name: "User Management",
@@ -221,3 +196,4 @@ export const useNavItems = (): NavItem[] => {
     },
   ];
 };
+

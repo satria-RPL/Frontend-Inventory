@@ -3,11 +3,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { Eye, Pencil, Trash2, Plus } from "lucide-react";
 import Pagination from "@/components/ui/Pagination";
+import AddRoleModal from "@/components/modals/AddRoleModal";
+import EditRoleModal from "@/components/modals/EditRoleModal";
+import ViewRoleModal from "@/components/modals/ViewRoleModal";
+import DeleteRoleModal from "@/components/modals/DeleteRoleModal";
+import { canEditTarget, canManageUsers } from "@/lib/utils/role-hierarchy";
 
 type RoleItem = {
   id: number;
   name: string;
-  guardName: string;
+  description: string;
+  permissions?: string[];
   createdAt: string;
   updatedAt: string;
 };
@@ -15,15 +21,20 @@ type RoleItem = {
 type RoleApiItem = {
   id?: number | string;
   name?: string;
-  guardName?: string;
-  guard_name?: string;
+  description?: string;
+  permissions?: string[];
   createdAt?: string;
   created_at?: string;
+  created?: string;
   updatedAt?: string;
   updated_at?: string;
+  updated?: string;
 };
 
-type RolesApiResponse = RoleApiItem[] | { data?: RoleApiItem[] };
+type RolesApiResponse =
+  | RoleApiItem[]
+  | { data?: RoleApiItem[] | { roles?: RoleApiItem[] } }
+  | { roles?: RoleApiItem[] };
 
 function toNumberId(value: unknown, fallback: number) {
   if (typeof value === "number" && Number.isFinite(value)) return value;
@@ -36,14 +47,31 @@ function toNumberId(value: unknown, fallback: number) {
   return fallback;
 }
 
+function formatDate(value: string | undefined) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  const pad = (num: number) => String(num).padStart(2, "0");
+  return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
+}
+
 function normalizeRoles(payload: RolesApiResponse | null): RoleItem[] {
-  const list = Array.isArray(payload) ? payload : payload?.data ?? [];
+  const list = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.data)
+      ? payload?.data
+      : payload?.data && typeof payload.data === "object" && "roles" in payload.data
+        ? (payload.data as { roles?: RoleApiItem[] }).roles ?? []
+        : payload && typeof payload === "object" && "roles" in payload
+          ? (payload as { roles?: RoleApiItem[] }).roles ?? []
+          : [];
   return list.map((item, index) => ({
     id: toNumberId(item.id, index + 1),
     name: item.name ?? "-",
-    guardName: item.guardName ?? item.guard_name ?? "-",
-    createdAt: item.createdAt ?? item.created_at ?? "-",
-    updatedAt: item.updatedAt ?? item.updated_at ?? "-",
+    description: item.description ?? "-",
+    permissions: Array.isArray(item.permissions) ? item.permissions : [],
+    createdAt: formatDate(item.createdAt ?? item.created_at ?? item.created),
+    updatedAt: formatDate(item.updatedAt ?? item.updated_at ?? item.updated),
   }));
 }
 
@@ -54,55 +82,111 @@ export default function Roles() {
   const [roles, setRoles] = useState<RoleItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAddRole, setShowAddRole] = useState(false);
+  const [editingRole, setEditingRole] = useState<RoleItem | null>(null);
+  const [viewingRole, setViewingRole] = useState<RoleItem | null>(null);
+  const [deletingRole, setDeletingRole] = useState<RoleItem | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [sessionRole, setSessionRole] = useState("");
+  const [canManageRoles, setCanManageRoles] = useState(false);
 
   useEffect(() => {
     let isActive = true;
 
-    async function loadRoles() {
-      setLoading(true);
-      setError(null);
+    async function loadSessionUser() {
       try {
-        const res = await fetch("/api/roles", { cache: "no-store" });
-        const data = (await res
-          .json()
-          .catch(() => null)) as RolesApiResponse | null;
-        if (!res.ok) {
-          const message =
-            data && typeof data === "object" && "message" in data
-              ? String((data as { message?: unknown }).message)
-              : "Gagal memuat role.";
-          throw new Error(message);
-        }
-
+        const res = await fetch("/api/session-user", { cache: "no-store" });
+        const data = (await res.json().catch(() => null)) as { role?: string } | null;
+        if (!isActive) return;
+        const role = data?.role ?? "";
+        setSessionRole(role);
+        setCanManageRoles(canManageUsers(role));
+      } catch {
         if (isActive) {
-          setRoles(normalizeRoles(data));
-        }
-      } catch (err) {
-        if (isActive) {
-          setRoles([]);
-          setError(err instanceof Error ? err.message : "Gagal memuat role.");
-        }
-      } finally {
-        if (isActive) {
-          setLoading(false);
+          setSessionRole("");
+          setCanManageRoles(false);
         }
       }
     }
 
-    loadRoles();
+    loadSessionUser();
     return () => {
       isActive = false;
     };
   }, []);
 
+  const loadRoles = async (isActiveRef?: () => boolean) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/roles", { cache: "no-store" });
+      const data = (await res
+        .json()
+        .catch(() => null)) as RolesApiResponse | null;
+      if (!res.ok) {
+        const message =
+          data && typeof data === "object" && "message" in data
+            ? String((data as { message?: unknown }).message)
+            : "Gagal memuat role.";
+        throw new Error(message);
+      }
+
+      if (!isActiveRef || isActiveRef()) {
+        setRoles(normalizeRoles(data));
+      }
+    } catch (err) {
+      if (!isActiveRef || isActiveRef()) {
+        setRoles([]);
+        setError(err instanceof Error ? err.message : "Gagal memuat role.");
+      }
+    } finally {
+      if (!isActiveRef || isActiveRef()) {
+        setLoading(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    let isActive = true;
+    loadRoles(() => isActive);
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  const handleDeleteRole = async (password: string) => {
+    if (!deletingRole) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const res = await fetch(`/api/roles/${deletingRole.id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: password.trim() }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        const message =
+          data && typeof data === "object" && "message" in data
+            ? String((data as { message?: unknown }).message)
+            : "Gagal menghapus role.";
+        throw new Error(message);
+      }
+      setDeletingRole(null);
+      await loadRoles();
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Gagal menghapus role.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const filteredRoles = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     if (!normalized) return roles;
     return roles.filter((role) => {
-      return (
-        role.name.toLowerCase().includes(normalized) ||
-        role.guardName.toLowerCase().includes(normalized)
-      );
+      return role.name.toLowerCase().includes(normalized);
     });
   }, [query, roles]);
 
@@ -119,13 +203,16 @@ export default function Roles() {
     <div className="min-h-screen space-y-6 p-4">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-medium">Role Management</h1>
-        <button
-          type="button"
-          className="flex items-center gap-2 rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
-        >
-          <Plus size={16} />
-          Add New Role
-        </button>
+        {canManageRoles ? (
+          <button
+            type="button"
+            onClick={() => setShowAddRole(true)}
+            className="flex items-center gap-2 rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
+          >
+            <Plus size={16} />
+            Add New Role
+          </button>
+        ) : null}
       </div>
 
       <div className="border border-gray-200" />
@@ -147,7 +234,7 @@ export default function Roles() {
             <tr className="text-left text-xs font-medium text-[#9a9a9a]">
               <th className="px-4 py-3 text-center">#</th>
               <th className="px-4 py-3">Nama Role</th>
-              <th className="px-4 py-3">Guard Name</th>
+              <th className="px-4 py-3">Deskripsi</th>
               <th className="px-4 py-3">Created At</th>
               <th className="px-4 py-3">Updated At</th>
               <th className="px-4 py-3 text-center">Aksi</th>
@@ -157,7 +244,7 @@ export default function Roles() {
             {loading && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={5}
                   className="py-10 text-center text-sm text-[#9a9a9a]"
                 >
                   Memuat data...
@@ -168,7 +255,7 @@ export default function Roles() {
             {!loading && error && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={5}
                   className="py-10 text-center text-sm text-red-500"
                 >
                   {error}
@@ -179,7 +266,7 @@ export default function Roles() {
             {!loading && !error && pagedRoles.length === 0 && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={5}
                   className="py-10 text-center text-sm text-[#9a9a9a]"
                 >
                   Data tidak ditemukan.
@@ -200,32 +287,44 @@ export default function Roles() {
                   <td className="px-4 py-3 font-medium text-[#3f2f23]">
                     {role.name}
                   </td>
-                  <td className="px-4 py-3">{role.guardName}</td>
-                  <td className="px-4 py-3">{role.createdAt}</td>
-                  <td className="px-4 py-3">{role.updatedAt}</td>
-                  <td className="px-4 py-3">
+                    <td className="px-4 py-3">{role.description}</td>
+                    <td className="px-4 py-3">{role.createdAt}</td>
+                    <td className="px-4 py-3">{role.updatedAt}</td>
+                    <td className="px-4 py-3">
                     <div className="flex items-center justify-center gap-2">
-                      <button
-                        type="button"
-                        aria-label="Edit role"
-                        className="flex h-7 w-7 items-center justify-center rounded-md bg-orange-500 text-white hover:opacity-90"
-                      >
-                        <Pencil size={14} />
-                      </button>
-                      <button
-                        type="button"
-                        aria-label="Delete role"
-                        className="flex h-7 w-7 items-center justify-center rounded-md bg-[#ef4444] text-white hover:opacity-90"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                      <button
-                        type="button"
-                        aria-label="View role"
-                        className="flex h-7 w-7 items-center justify-center rounded-md bg-[#22c55e] text-white hover:opacity-90"
-                      >
-                        <Eye size={14} />
-                      </button>
+                      {canEditTarget(sessionRole, role.name) ? (
+                        <button
+                          type="button"
+                          aria-label="Edit role"
+                          onClick={() => setEditingRole(role)}
+                          className="flex h-7 w-7 items-center justify-center rounded-md bg-orange-500 text-white hover:opacity-90"
+                        >
+                          <Pencil size={14} />
+                        </button>
+                      ) : null}
+                      {canEditTarget(sessionRole, role.name) ? (
+                        <button
+                          type="button"
+                          aria-label="Delete role"
+                          onClick={() => {
+                            setDeletingRole(role);
+                            setDeleteError(null);
+                          }}
+                          className="flex h-7 w-7 items-center justify-center rounded-md bg-[#ef4444] text-white hover:opacity-90"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      ) : null}
+                      {canManageRoles ? (
+                        <button
+                          type="button"
+                          aria-label="View role"
+                          onClick={() => setViewingRole(role)}
+                          className="flex h-7 w-7 items-center justify-center rounded-md bg-[#22c55e] text-white hover:opacity-90"
+                        >
+                          <Eye size={14} />
+                        </button>
+                      ) : null}
                     </div>
                   </td>
                 </tr>
@@ -254,6 +353,35 @@ export default function Roles() {
           setPerPage={setPerPage}
         />
       </div>
+
+      <AddRoleModal
+        open={showAddRole}
+        onClose={() => setShowAddRole(false)}
+        onCreated={async () => {
+          await loadRoles();
+        }}
+      />
+      <EditRoleModal
+        open={Boolean(editingRole)}
+        onClose={() => setEditingRole(null)}
+        role={editingRole}
+        onUpdated={async () => {
+          await loadRoles();
+        }}
+      />
+      <ViewRoleModal
+        open={Boolean(viewingRole)}
+        onClose={() => setViewingRole(null)}
+        role={viewingRole}
+      />
+      <DeleteRoleModal
+        open={Boolean(deletingRole)}
+        roleName={deletingRole?.name}
+        loading={deleting}
+        error={deleteError}
+        onClose={() => setDeletingRole(null)}
+        onConfirm={handleDeleteRole}
+      />
     </div>
   );
 }

@@ -51,3 +51,50 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export async function POST(request: NextRequest) {
+  if (!normalizedApiBaseUrl) {
+    return NextResponse.json(
+      { message: "API_BASE_URL belum diset." },
+      { status: 500 }
+    );
+  }
+
+  const authPayload = await getAuthTokenFromCookie();
+  if (!authPayload?.token) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  const backendUrl = `${normalizedApiBaseUrl}/api/users`;
+
+  const headers: HeadersInit = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    Authorization: `${authPayload.tokenType ?? "Bearer"} ${authPayload.token}`,
+  };
+
+  try {
+    const body = await request.json().catch(() => ({}));
+    const res = await fetch(backendUrl, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      const message =
+        data && typeof data === "object" && "message" in data
+          ? String((data as { message?: unknown }).message)
+          : "Gagal menambahkan user.";
+      return NextResponse.json({ message, data }, { status: res.status });
+    }
+
+    return NextResponse.json(data, { status: res.status });
+  } catch {
+    return NextResponse.json(
+      { message: "Koneksi ke server gagal." },
+      { status: 500 }
+    );
+  }
+}
